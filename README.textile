@@ -92,7 +92,8 @@ class FacebookService implements FacebookServiceInterface {
                 } else {
                         username = getAndUpdateUser(data, details)?.alias
                 }
-[...]
+
+p. [...]
 
 
 h3. Provide the login
@@ -104,7 +105,7 @@ Otherwise please have a look at the "JavaScript SDK":http://developers.facebook.
 # Add to the end of your main.gsp a script block: @var facebook = { apiKey: '${g.facebookApiKey()}' };@
 # Add to your application scripts (example):
 
-pre.. // make sure facebook is initialized before calling the facebook JS api
+pre. // make sure facebook is initialized before calling the facebook JS api
 window.fbEnsure = function(callback) {
   if (window.facebookInitialized) { callback(); return; }
   FB.init({
@@ -116,7 +117,6 @@ window.fbEnsure = function(callback) {
   window.facebookInitialized = true;
   callback();
 };
-
 /**
  * Just connect (for logged in users) to facebook and reassociate the user
  * (and possibly get the facebook profile picture if no avatar yet set).
@@ -135,7 +135,6 @@ $(function() {
 		if (trigger.hasClass('fbEmail')) {
 			perms.perms = "email";
 		}
-
 		trigger.click(function(event) {
 			fbEnsure(function() {
 				FB.login(function(response) {
