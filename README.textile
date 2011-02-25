@@ -1,0 +1,161 @@
+h1. Spring Security Facebook Connect
+
+A "grails":http://grails.org plugin.
+
+The plugin allows you to extend your standard spring security DAO-based authentication
+with facebook connect utilizing the facebook JavaScript SDK and the Graph API
+while associating the facebook user with a local account.
+
+* Using the "JavaScript SDK":http://developers.facebook.com/docs/reference/javascript/ you can pass in permissions you like the user to approve. 
+* The user gets a cookie, which you can use at the backend to talk to facebook over the "Graph API":http://developers.facebook.com/docs/reference/api/ .
+
+
+h2. Installation
+
+# Download the plugin zip or clone this repository.
+# @grails install-plugin [path-to-plugin-zip]@
+
+
+h2. Configuration
+
+The plugin is domain aware. So you can use different apikeys/secrets for each domain you support.
+Alternatively omit the @domains@ setting and provide @apiKey@ and @secretKey@ directly.
+
+Inside your Config.groovy:
+
+pre. grails {
+  plugins {
+    springsecurity {
+      facebook {
+        domains = [
+          com: [apiKey: "your api key for .com", secretKey: "your secret"],
+          de: [apiKey: "your api key for .de", secretKey: "your secret"],
+          localhost: [apiKey: "your api key for .de", secretKey: "your secret"]
+        ]
+      }
+      ...
+    }
+  }
+}
+
+
+h2. Implementation
+
+What do you need to add...
+
+h3. Bridge Facebook users to your local users
+
+# @grails create-service api.Facebook
+# Create a FacebookUser domain class mapping a facebook user to an AuthUser e.g.
+# Implement the @FacebookService@ Interface:
+
+pre.. import grails.plugins.springsecurity.facebook.FacebookService as FacebookServiceInterface
+
+import grails.plugins.springsecurity.facebook.FacebookAuthenticationDetails
+import grails.plugins.springsecurity.facebook.FacebookCookie
+import grails.plugins.springsecurity.facebook.FacebookUtils
+
+class FacebookService implements FacebookServiceInterface {
+
+        static transactional = false
+
+        /**
+         * Returns a valid username related to the facebook user details.
+         *
+         * @param details the facebook authentication details
+         * @return the alias associated with the email given
+         */
+        String getUsername(FacebookAuthenticationDetails details) {
+                if (!details.uid || !details.email) {
+                        log.error "could not retrieve username as either uid or email were not given"
+                        return null
+                }
+
+                // try to resolve FacebookUser by uid
+                def fbUser = FacebookUser.findByFacebookId(details.uid)
+
+                // if found, just return the associated username
+                if (fbUser) {
+                        return fbUser.authUser.username
+                }
+
+                // else try to resolve user by email
+                def email = details.email
+                ... find by mail ...
+                
+                def username
+                // create a new user if no relationship could be resolved
+                if (!found) {
+                        username = createUser(details)?.username
+
+                // otherwise update existing users data and get his username
+                } else {
+                        username = getAndUpdateUser(data, details)?.alias
+                }
+[...]
+
+
+h3. Provide the login
+
+If you are using already jQuery and ui-performance plugin you can directly use the convenience tag lib for including facebook js sdk.
+Otherwise please have a look at the "JavaScript SDK":http://developers.facebook.com/docs/reference/javascript/.
+
+# Add to your main.gsp: @<g:facebookInit/>@ which will add jQuery code to load the sdk.
+# Add to the end of your main.gsp a script block: @var facebook = { apiKey: '${g.facebookApiKey()}' };@
+# Add to your application scripts (example):
+
+pre.. // make sure facebook is initialized before calling the facebook JS api
+window.fbEnsure = function(callback) {
+  if (window.facebookInitialized) { callback(); return; }
+  FB.init({
+    appId  : facebook.apiKey,
+    status : true, // check login status
+    cookie : true, // enable cookies to allow the server to access the session
+    xfbml  : false  // parse XFBML
+  });
+  window.facebookInitialized = true;
+  callback();
+};
+
+/**
+ * Just connect (for logged in users) to facebook and reassociate the user
+ * (and possibly get the facebook profile picture if no avatar yet set).
+ * Triggers two events on the '.fbJustConnect' element:
+ * - "connected" will be triggered if the reassociation was successful
+ * - "failed" will be triggered when for whatever reason the coupling was unsuccessful
+ */
+$(function() {
+	$.fn.fbConnect = function(options) {
+		var settings = $.extend({
+		// put your defaults here
+		}, options);
+		var trigger = $(this);
+		var perms = { perms: "" };
+		// example for passing in needed permissions per class name
+		if (trigger.hasClass('fbEmail')) {
+			perms.perms = "email";
+		}
+
+		trigger.click(function(event) {
+			fbEnsure(function() {
+				FB.login(function(response) {
+					if (response.session) {
+						if (response.perms || !trigger.hasClass('fbEmail')) {
+							trigger.trigger("connected");
+						} else {
+							trigger.trigger("failed");
+						}
+					} else {
+						trigger.trigger("failed");
+					}
+				}, perms);
+			});
+		});
+	};
+	$('.fbJustConnect').fbConnect();
+});
+
+
+h3. Use it
+
+# Put a button in any gsp: @<div class="fbJustConnect fbEmail">Connect with Facebook</div>@
