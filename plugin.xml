@@ -1,20 +1,20 @@
 <plugin name='spring-security-facebook' version='0.1' grailsVersion='1.2.2 &gt; *'>
-	<author>Patrick Schmidt</author>
-	<authorEmail>pschmidt@web2come.com</authorEmail>
-	<title>Spring Security Facebook Connect</title>
-	<description>\
-		The plugin allows you to extend your standard spring security DAO-based authentication
-		with facebook connect utilizing the facebook JavaScript SDK and the Graph API
-		while associating the facebook user with a local account.
+  <author>Patrick Schmidt</author>
+  <authorEmail>pschmidt@web2come.com</authorEmail>
+  <title>Spring Security Facebook Connect</title>
+  <description>\
+The plugin allows you to extend your standard spring security DAO-based authentication
+with facebook connect utilizing the facebook JavaScript SDK and the Graph API
+while associating the facebook user with a local account.
 
-	</description>
-	<documentation>http://grails.org/plugin/spring-security-facebook</documentation>
-	<resources>
-		<resource>UrlMappings</resource>
-		<resource>grails.plugins.springsecurity.facebook.FacebookTagLib</resource>
-	</resources>
-	<dependencies>
-		<plugin name='springSecurityCore' version='1.0 &gt; *'/>
-	</dependencies>
-	<behavior/>
+</description>
+  <documentation>http://grails.org/plugin/spring-security-facebook</documentation>
+  <resources>
+    <resource>UrlMappings</resource>
+    <resource>grails.plugins.springsecurity.facebook.FacebookTagLib</resource>
+  </resources>
+  <dependencies>
+    <plugin name='springSecurityCore' version='1.0 &gt; *' />
+  </dependencies>
+  <behavior />
 </plugin>
