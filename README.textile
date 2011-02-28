@@ -45,7 +45,7 @@ What do you need to add...
 
 h3. Bridge Facebook users to your local users
 
-# @grails create-service api.Facebook
+# @grails create-service api.Facebook@
 # Create a FacebookUser domain class mapping a facebook user to an AuthUser e.g.
 # Implement the @FacebookService@ Interface:
 
