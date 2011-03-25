@@ -20,15 +20,13 @@ import javax.servlet.http.HttpServletRequest
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 import org.springframework.beans.factory.InitializingBean
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
-import org.springframework.security.web.WebAttributes
-import org.springframework.security.core.context.SecurityContextHolder
+
 import org.springframework.security.core.AuthenticationException
 import javax.servlet.http.HttpServletResponse
-import org.springframework.security.web.authentication.AuthenticationFailureHandler
+
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
 import org.springframework.security.core.Authentication
-import javax.servlet.ServletException
+
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 
 /**
@@ -36,10 +34,10 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  *
  * @author Patrick Schmidt
  */
-class FacebookPreAuthenticatedProcessingFilter extends AbstractAuthenticationProcessingFilter
+class FacebookAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter
     implements InitializingBean {
 
-	static log = LogFactory.getLog(FacebookPreAuthenticatedProcessingFilter.class)
+	static log = LogFactory.getLog(FacebookAuthenticationProcessingFilter.class)
 
 	def apiKey
 	def secretKey
@@ -53,8 +51,8 @@ class FacebookPreAuthenticatedProcessingFilter extends AbstractAuthenticationPro
 		assert (apiKey && secretKey) || domains, "Either provide facebook apiKey and secretKey or set both per domain."
 	}
 
-    FacebookPreAuthenticatedProcessingFilter() {
-        super("/j_spring_facebook_security_check")
+    FacebookAuthenticationProcessingFilter() {
+        super("/j_spring_security_facebook_check")
     }
 
     @Override

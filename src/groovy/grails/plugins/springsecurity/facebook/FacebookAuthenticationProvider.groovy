@@ -27,16 +27,11 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.WebAttributes
-import org.springframework.security.web.authentication.AuthenticationFailureHandler
 
-class FacebookPreAuthenticatedAuthenticationProvider
+class FacebookAuthenticationProvider
     implements AuthenticationProvider, InitializingBean, Ordered {
 
-	static log = LogFactory.getLog(FacebookPreAuthenticatedAuthenticationProvider.class)
+	static log = LogFactory.getLog(FacebookAuthenticationProvider.class)
 
 	AuthenticationUserDetailsService facebookUserDetailsService = null;
 	def userDetailsChecker = new AccountStatusUserDetailsChecker()
@@ -68,7 +63,7 @@ class FacebookPreAuthenticatedAuthenticationProvider
 			return null
 		}
 
-		log.debug "FacebookPreAuthenticated authentication request: $authentication"
+		log.debug "FacebookAuthenticated authentication request: $authentication"
 
 		// check for connection status
 		if (!authentication.details.connected) {
@@ -83,7 +78,7 @@ class FacebookPreAuthenticatedAuthenticationProvider
 		userDetailsChecker.check(ud)
 
 		PreAuthenticatedAuthenticationToken result =
-		new PreAuthenticatedAuthenticationToken(ud, authentication.getCredentials(), ud.getAuthorities());
+		    new PreAuthenticatedAuthenticationToken(ud, authentication.getCredentials(), ud.getAuthorities());
 		result.details = authentication.details
 
 		return result

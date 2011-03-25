@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails
 /**
  * Extends the standard web authentication details by extracting the facebook
  * user's session information and checking for its validity. This information
- * is later evaluated by the FacebookPreAuthenticatedAuthenticationProvider.
+ * is later evaluated by the FacebookAuthenticationProvider.
  *
  * @author Patrick Schmidt
  */
@@ -73,7 +73,8 @@ class FacebookAuthenticationDetails extends WebAuthenticationDetails {
 		accessToken = cookie.accessToken
 		connected = true
 		email = user.email
-        username = user.username
+        username = user.username ?:
+            "${user.first_name?.toLowerCase()}.${user.last_name?.toLowerCase()}"
 		firstname = user.first_name
 		lastname = user.last_name
 

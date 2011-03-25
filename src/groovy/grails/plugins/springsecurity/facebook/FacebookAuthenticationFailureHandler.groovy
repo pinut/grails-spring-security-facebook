@@ -26,14 +26,17 @@ class FacebookAuthenticationFailureHandler extends AjaxAwareAuthenticationFailur
 			return;
 		}
 
+        saveException(request, exception)
+
 		String createAccountUri = (String)ReflectionUtils.getConfigProperty("facebook.registration.createAccountUri");
 		getRedirectStrategy().sendRedirect(request, response, createAccountUri);
 	}
 
 	private boolean isSuccessfulLoginUnknownUser(AuthenticationException exception) {
-		if (!(exception instanceof UsernameNotFoundException)) {
-			return false;
+		if (exception instanceof FacebookNotYetRegisteredUserException) {
+			return true
 		}
+        return false
 
 	}
 
