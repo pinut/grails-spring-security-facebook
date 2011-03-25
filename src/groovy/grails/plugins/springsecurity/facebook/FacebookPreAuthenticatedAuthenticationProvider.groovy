@@ -27,9 +27,14 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.WebAttributes
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
 
 class FacebookPreAuthenticatedAuthenticationProvider
-implements AuthenticationProvider, InitializingBean, Ordered {
+    implements AuthenticationProvider, InitializingBean, Ordered {
 
 	static log = LogFactory.getLog(FacebookPreAuthenticatedAuthenticationProvider.class)
 
@@ -58,7 +63,7 @@ implements AuthenticationProvider, InitializingBean, Ordered {
 		log.debug "authenticate called"
 		if (!supports(authentication.getClass())
 				&& !authentication.details
-				&& !FacebookAuthenticationDeatils.isAssignableFrom(authentication.details.class)) {
+				&& !FacebookAuthenticationDetails.isAssignableFrom(authentication.details.class)) {
 			log.debug "not supported!"
 			return null
 		}
@@ -107,5 +112,8 @@ implements AuthenticationProvider, InitializingBean, Ordered {
 	public void setThrowExceptionWhenTokenRejected(boolean throwExceptionWhenTokenRejected) {
 		this.throwExceptionWhenTokenRejected = throwExceptionWhenTokenRejected;
 	}
+
+
+
 
 }

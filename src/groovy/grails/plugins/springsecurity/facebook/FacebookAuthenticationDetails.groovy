@@ -37,6 +37,7 @@ class FacebookAuthenticationDetails extends WebAuthenticationDetails {
 
 	/** The facebook user's data  */
 	def uid
+    def username
 	def email
 	def firstname
 	def lastname
@@ -72,6 +73,7 @@ class FacebookAuthenticationDetails extends WebAuthenticationDetails {
 		accessToken = cookie.accessToken
 		connected = true
 		email = user.email
+        username = user.username
 		firstname = user.first_name
 		lastname = user.last_name
 

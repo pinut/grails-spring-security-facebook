@@ -21,14 +21,23 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
+import org.springframework.security.web.WebAttributes
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.AuthenticationException
+import javax.servlet.http.HttpServletResponse
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
+import org.springframework.security.core.Authentication
+import javax.servlet.ServletException
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 
 /**
  *
  *
  * @author Patrick Schmidt
  */
-class FacebookPreAuthenticatedProcessingFilter extends AbstractPreAuthenticatedProcessingFilter
-implements InitializingBean {
+class FacebookPreAuthenticatedProcessingFilter extends AbstractAuthenticationProcessingFilter
+    implements InitializingBean {
 
 	static log = LogFactory.getLog(FacebookPreAuthenticatedProcessingFilter.class)
 
@@ -40,10 +49,44 @@ implements InitializingBean {
 	 * Check whether all required properties have been set.
 	 */
 	void afterPropertiesSet() {
+        super.afterPropertiesSet()
 		assert (apiKey && secretKey) || domains, "Either provide facebook apiKey and secretKey or set both per domain."
 	}
 
-	/**
+    FacebookPreAuthenticatedProcessingFilter() {
+        super("/j_spring_facebook_security_check")
+    }
+
+    @Override
+    Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authResult = null;
+
+        Object principal = getPreAuthenticatedPrincipal(request);
+        Object credentials = getPreAuthenticatedCredentials(request);
+
+        if (principal == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No pre-authenticated principal found in request");
+            }
+
+            return;
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("preAuthenticatedPrincipal = " + principal + ", trying to authenticate");
+        }
+
+        try {
+            PreAuthenticatedAuthenticationToken authRequest = new PreAuthenticatedAuthenticationToken(principal, credentials);
+            authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
+            authResult = authenticationManager.authenticate(authRequest);
+            successfulAuthentication(request, response, authResult);
+        } catch (AuthenticationException failed) {
+            unsuccessfulAuthentication(request, response, failed);
+        }
+    }
+
+    /**
 	 * If facebook cookies are given extracts the current facebook user and
 	 * returns his user id, otherwise null is returned. The users session will
 	 * be checked by the WebAuthenticationDetailsSource populating a
@@ -74,6 +117,7 @@ implements InitializingBean {
 
 		// evaluate cookies
 		def cookieValue = request.cookies.find { it.name == "fbs_${apiKey}" }?.value
+        log.debug "cookie ${cookieValue}"
 		if (!cookieValue) { return null }
 
 		// verify cookie

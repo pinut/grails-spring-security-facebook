@@ -36,6 +36,7 @@ class FacebookCookie {
 
 	String apiKey
 	String secretKey
+    String base_domain
 
 	String getAccessToken() {
 		access_token
@@ -60,16 +61,13 @@ class FacebookCookie {
 	 */
 	boolean isValid() {
 		log.debug "attempting to validate cookie"
-//		println "apiKey = $apiKey \nsecretKey = $secretKey"
 		def payload = "access_token=${access_token}expires=${expires}secret=${secret}session_key=${session_key}uid=${uid}"
-//		println "payload = $payload"
-//		println "testing " + "${payload}${secretKey}".encodeAsMD5() + " == " + sig
 		def encodedPayload = "${payload}${secretKey}".encodeAsMD5()
 		def valid = encodedPayload == sig
 		if (!valid) {
-			log.warn """payload could not be verified, will ignore for now
-						- encoded payload: $encodedPayload
-						-       signature: $sig"""
+//			log.warn """payload could not be verified, will ignore for now
+//						- encoded payload: $encodedPayload
+//						-       signature: $sig"""
 		}
 
 		// TODO :: get the validation working

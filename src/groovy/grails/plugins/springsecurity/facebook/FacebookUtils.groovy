@@ -17,6 +17,7 @@
 package grails.plugins.springsecurity.facebook
 
 import grails.converters.JSON
+import org.apache.commons.logging.LogFactory
 
 /**
  * Provides helper methods for dealing with facebook connect.
@@ -26,6 +27,7 @@ import grails.converters.JSON
 class FacebookUtils {
 
 	private static final String GRAPH_URL = "https://graph.facebook.com"
+    static log = LogFactory.getLog(FacebookUtils.class)
 
 	String apiKey
 	String secretKey
@@ -68,7 +70,7 @@ class FacebookUtils {
 				result = JSON.parse(conn.inputStream.text)
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace()
+			log.debug("cannot invoke api: ${ex}", ex)
 		}
 		result
 	}

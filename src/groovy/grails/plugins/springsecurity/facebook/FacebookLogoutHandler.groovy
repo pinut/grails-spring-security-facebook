@@ -55,6 +55,8 @@ class FacebookLogoutHandler implements LogoutHandler, InitializingBean {
 		delCookie.maxAge = 0
 		delCookie.path = "/"
 		response.addCookie(delCookie)
+
+        println "cookie removed"
 	}
 
 	private extractDomain(HttpServletRequest request) {
