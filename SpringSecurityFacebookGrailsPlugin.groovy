@@ -4,7 +4,7 @@ import grails.plugins.springsecurity.facebook.*
 
 class SpringSecurityFacebookGrailsPlugin {
 	// the plugin version
-	def version = "0.1"
+	def version = "0.1.1"
 	// the version or versions of Grails the plugin is designed for
 	String grailsVersion = '1.2.2 > *'
 	// the other plugins this plugin depends on
