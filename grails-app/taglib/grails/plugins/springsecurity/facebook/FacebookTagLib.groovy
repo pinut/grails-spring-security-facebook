@@ -58,36 +58,24 @@ class FacebookTagLib {
 
 		def scripts = new StringBuilder()
 		scripts << """
-			<script type="text/javascript">
-			  \$(function() {
-				  var fbInit = function() {
-	    """
+            <div id="fb-root"></div>
+			<script type="text/javascript" src="http://connect.facebook.net/${locale}/all.js"></script>
+			<script type="text/javascript">"""
+
 		if (initOnLoad) {
 			scripts << """
 				      FB.init({
-					      appId  : '${apiKey}',
-					      status : true, // check login status
-					      cookie : true, // enable cookies to allow the server to access the session
-					      xfbml  : false  // parse XFBML
+					      appId: '${apiKey}', status: true, cookie: true, xfbml: true
 					  });
-					  window.facebookInitialized = true;
 			"""
 		}
 		scripts << """
-				  };
-				  \$('<div/>').attr("id", "fb-root").appendTo('body');
-				  \$.getScript('http://connect.facebook.net/${locale}/all.js', fbInit);
-			  });
 			</script>
 		"""
 
 		// By convention actions which name ends in "Ajax" are assumed to render templates
 		// thus relevant scripts are not subject to ui performance dependant javascript handling
-		if (actionName ==~ /.*?Ajax/) {
-			out << scripts.toString()
-		} else {
-			p.dependantJavascript javascript: scripts.toString()
-		}
+        out << scripts.toString()
 	}
 
 	/**
