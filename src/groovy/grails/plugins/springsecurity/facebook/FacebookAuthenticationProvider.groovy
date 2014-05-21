@@ -28,10 +28,10 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 
-class FacebookPreAuthenticatedAuthenticationProvider
-implements AuthenticationProvider, InitializingBean, Ordered {
+class FacebookAuthenticationProvider
+    implements AuthenticationProvider, InitializingBean, Ordered {
 
-	static log = LogFactory.getLog(FacebookPreAuthenticatedAuthenticationProvider.class)
+	static log = LogFactory.getLog(FacebookAuthenticationProvider.class)
 
 	AuthenticationUserDetailsService facebookUserDetailsService = null;
 	def userDetailsChecker = new AccountStatusUserDetailsChecker()
@@ -58,12 +58,12 @@ implements AuthenticationProvider, InitializingBean, Ordered {
 		log.debug "authenticate called"
 		if (!supports(authentication.getClass())
 				&& !authentication.details
-				&& !FacebookAuthenticationDeatils.isAssignableFrom(authentication.details.class)) {
+				&& !FacebookAuthenticationDetails.isAssignableFrom(authentication.details.class)) {
 			log.debug "not supported!"
 			return null
 		}
 
-		log.debug "FacebookPreAuthenticated authentication request: $authentication"
+		log.debug "FacebookAuthenticated authentication request: $authentication"
 
 		// check for connection status
 		if (!authentication.details.connected) {
@@ -78,7 +78,7 @@ implements AuthenticationProvider, InitializingBean, Ordered {
 		userDetailsChecker.check(ud)
 
 		PreAuthenticatedAuthenticationToken result =
-		new PreAuthenticatedAuthenticationToken(ud, authentication.getCredentials(), ud.getAuthorities());
+		    new PreAuthenticatedAuthenticationToken(ud, authentication.getCredentials(), ud.getAuthorities());
 		result.details = authentication.details
 
 		return result
@@ -107,5 +107,8 @@ implements AuthenticationProvider, InitializingBean, Ordered {
 	public void setThrowExceptionWhenTokenRejected(boolean throwExceptionWhenTokenRejected) {
 		this.throwExceptionWhenTokenRejected = throwExceptionWhenTokenRejected;
 	}
+
+
+
 
 }

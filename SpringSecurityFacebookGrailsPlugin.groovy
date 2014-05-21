@@ -49,15 +49,16 @@ while associating the facebook user with a local account.
 			clazz = FacebookAuthenticationDetails.class
 		}
 
-		facebookFilter(FacebookPreAuthenticatedProcessingFilter) {
+		facebookFilter(FacebookAuthenticationProcessingFilter) {
 			authenticationManager = ref("authenticationManager")
 			authenticationDetailsSource = ref("facebookAuthenticationDetailsSource")
+            authenticationFailureHandler = ref("facebookAuthenticationFailureHandler")
 			apiKey = conf.facebook.apiKey
 			secretKey = conf.facebook.secretKey
 			domains = conf.facebook.domains
 		}
 
-		facebookAuthProvider(FacebookPreAuthenticatedAuthenticationProvider) {
+		facebookAuthProvider(FacebookAuthenticationProvider) {
 			facebookUserDetailsService = ref("facebookUserDetailsService")
 		}
 
@@ -70,6 +71,11 @@ while associating the facebook user with a local account.
 			apiKey = conf.facebook.apiKey
 			domains = conf.facebook.domains
 		}
+
+        facebookAuthenticationFailureHandler(FacebookAuthenticationFailureHandler) { bean ->
+            bean.parent = ref("authenticationFailureHandler")
+        }
+
 	}
 
 	def doWithDynamicMethods = { ctx ->
